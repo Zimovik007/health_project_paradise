@@ -101,11 +101,12 @@ app.ws('/', function(ws, req) {
 
   ws.on('message', (msg) => {
     console.log(msg);
+    let category_list = ['qwer', 'rewq'];
     let message = JSON.parse(msg);
     switch (message.message) {
       case 'game start':
         ws.user_id = message.id;
-        db.get('SELECT id FROM users WHERE searching = 1', [], (err, row) => {
+        db.get('SELECT id FROM users WHERE searching = 1 LIMIT 1', [], (err, row) => {
           if (err || !row) {
             db.run(`UPDATE users SET searching = 1 WHERE id = ?`, [message.id]);
             return;
@@ -118,15 +119,25 @@ app.ws('/', function(ws, req) {
               else {
                 let game_id = this.lastID;
                 let city_list = ['asdf', 'fdsa'];
-
+                console.log('start random choice');
                 ws_connections.forEach((item) => {
                   if (item.user_id === row.id) {
                     item.game_id = game_id;
                     ws.game_id = game_id;
-                    if (!!Math.round(Math.random()))
-                      item.send(JSON.stringify({message: 'city_list', data: city_list}));
-                    else
-                      ws.send(JSON.stringify({message: 'city_list', data: city_list}));
+                    
+                    //game found
+                    item.send("game found");
+                    ws.send("game found");
+
+                    //random choice
+                    if (!!Math.round(Math.random())){
+                      item.send(JSON.stringify({ choice: 1, message: 'city_list', data: city_list }));
+                      ws.send(JSON.stringify({ choice: 0, message: 'city_list', data: city_list }));
+                    }
+                    else{
+                      ws.send(JSON.stringify({ choice: 1, message: 'city_list', data: city_list }));
+                      item.send(JSON.stringify({ choice: 0, message: 'city_list', data: city_list }));
+                    }
                   }
                 });
               }
@@ -138,7 +149,6 @@ app.ws('/', function(ws, req) {
         db.run(`UPDATE matches SET city = ? WHERE id = ?`, [message.city_id, ws.game_id]);
 
         let city_list = ['asdf', 'fdsa'];
-        let category_list = ['qwer', 'rewq'];
 
         ws.send(JSON.stringify({message: 'city selected', data: city_list[message.city_id]}));
 
@@ -154,7 +164,6 @@ app.ws('/', function(ws, req) {
       case 'categories selected':
         db.run(`UPDATE matches SET categories = ? WHERE id = ?`, [message.categories.join(','), ws.game_id]);
 
-        let category_list = ['qwer', 'rewq'];
         let categories = [];
         message.categories.forEach((value) => {
           categories.push(category_list[value]);

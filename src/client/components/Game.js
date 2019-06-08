@@ -1,6 +1,8 @@
 import React from "react";
 import {Container, Row, Col, Button, Spinner, OverlayTrigger, Tooltip} from "react-bootstrap";
 
+import Websocket from 'react-websocket';
+
 import GameStage1 from './GameStage1';
 import GameStage2 from './GameStage2';
 import GameStage3 from './GameStage3';
@@ -16,10 +18,70 @@ class Game extends React.Component{
             cities: [],
             categories: [],
             winner: -1,
-            socket: null,
+            // socket: new WebSocket("ws://localhost:8080"),
         };
         this.findGame = this.findGame.bind(this);
+        this.onMessageWebSockets = this.onMessageWebSockets.bind(this);
     };
+
+    onMessageWebSockets(data){
+        const main = this;
+        if (data == 'game found'){
+            main.setState({
+                stage: 1,
+                isFindGame: false,
+            });
+        }
+        data = JSON.parse(data);
+        if (data.choice == 1 && main.state.stage == 1){
+            main.setState({
+                stage: 3, 
+                waitOrCity: data.choice,
+                cities: data.data,
+            });
+        }
+        else if (data.choice == 0 && main.state.stage == 1){
+            main.stage({
+                waitOrCity: data.choice,
+                stage: 3,
+            });
+        }
+        else if (main.state.stage == 2){
+            main.setState({
+                cities: data,
+                stage: 3,
+            });
+        }
+        else if (main.state.stage == 3){
+            main.setState({
+                city: data,
+                stage: 4,
+            });
+        }
+        else if (main.state.stage == 4 && !main.state.waitOrCity){
+            main.setState({
+                categories: data,
+                stage: 5,
+            });
+        }
+        else if (main.state.stage == 4 && main.state.waitOrCity){
+            main.setState({
+                deletedCategories: data,
+                stage: 6,
+            });
+        }
+        else if (main.state.stage == 5){
+            main.setState({
+                deletedCategories: data,
+                stage: 6,
+            });
+        }
+        else if (main.state.stage == 6){
+            main.setState({
+                winner: data,
+            });
+        }
+    }
 
     findGame(){
         if (!this.props.loginData.login)
@@ -28,74 +90,21 @@ class Game extends React.Component{
         main.setState({
             isFindGame: true,
         });
-        main.state.socket = new WebSocket("ws://localhost:8080");
-        main.state.socket.onopen = function(){
-            let obj = {
-                id: main.props.loginData.id,
-                message: 'game start',
-            };
-            main.state.socket.send(JSON.stringify(obj));
-        }
-        main.state.socket.onmessage = function(event) {
-            if (event.data == 'game found'){
-                main.setState({
-                    stage: 1,
-                    isFindGame: false,
-                });
-            }
-            else if (event.data == 1 && main.state.stage == 1){
-                main.setState({
-                    stage: 2, 
-                    waitOrCity: event.data,
-                });
-            }
-            else if (event.data == 0 && main.state.stage == 1){
-                main.stage({
-                    waitOrCity: event.data,
-                    stage: 3,
-                });
-            }
-            else if (main.state.stage == 2){
-                main.setState({
-                    cities: event.data,
-                    stage: 3,
-                });
-            }
-            else if (main.state.stage == 3){
-                main.setState({
-                    city: event.data,
-                    stage: 4,
-                });
-            }
-            else if (main.state.stage == 4 && !main.state.waitOrCity){
-                main.setState({
-                    categories: event.data,
-                    stage: 5,
-                });
-            }
-            else if (main.state.stage == 4 && main.state.waitOrCity){
-                main.setState({
-                    deletedCategories: event.data,
-                    stage: 6,
-                });
-            }
-            else if (main.state.stage == 5){
-                main.setState({
-                    deletedCategories: event.data,
-                    stage: 6,
-                });
-            }
-            else if (main.state.stage == 6){
-                main.setState({
-                    winner: event.data,
-                });
-            }
+        let obj = {
+            id: main.props.loginData.id,
+            message: 'game start',
         };
+        main.refWebSocket.sendMessage(JSON.stringify(obj));        
     }
 
     render(){
         return(
             <Container style={{flex: 1, height: '100%' }}>
+                <Websocket 
+                    url='ws://localhost:8080'
+                    onMessage={this.onMessageWebSockets}
+                    ref={ Websocket => { this.refWebSocket = Websocket }}
+                />
                 <Row style={{ height: "30%" }}></Row>
                 <Row>
                     <Col
