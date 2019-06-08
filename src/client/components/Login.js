@@ -1,6 +1,8 @@
 import React from "react";
 import {Container, Row, Col, Form, Button} from "react-bootstrap";
 
+import {Route, Redirect} from 'react-router';
+
 
 class Login extends React.Component{
     constructor(props){
@@ -8,6 +10,7 @@ class Login extends React.Component{
         this.state = {
             login: "",
             password: "",
+            id: "",
         };
 
         this.onChangeLogin = this.onChangeLogin.bind(this);
@@ -50,7 +53,19 @@ class Login extends React.Component{
             main.setState({
                 isLoading: false,
             });
-            console.log(response);
+            response.json().then(function(data){
+                if (data.status){
+                    alert("Неверный логин или пароль!");
+                    return;
+                }
+                let obj = {
+                    login: data.login,
+                    id: data.id,
+                };
+                main.setState({
+                    id: data.id,
+                });
+            })
           }
         )
         .catch(function(err) {
@@ -62,6 +77,18 @@ class Login extends React.Component{
     }
 
     render(){
+        if (this.state.id){
+            this.props.getLoginData({login: this.state.login, id: this.state.id});
+            return (
+                <Redirect push to={{ 
+                    pathname: '/', 
+                    state: {
+                        id: this.state.id,
+                        login: this.state.login,
+                    } 
+                }} />
+            );
+        }
         return(
             <Container>
                 <Row>
