@@ -116,11 +116,13 @@ app.ws('/', function(ws, req) {
           else {
             db.run(`UPDATE users SET searching = 0 WHERE id = ?`, [row.id]);
 
-            db.run(`INSERT INTO matches(id_first, id_second) VALUES(?, ?)`, [message.id, row.id], (err) => {
+
+
+            let stmt = db.prepare(`INSERT INTO matches(id_first, id_second) VALUES(?, ?)`);
+            stmt.run([message.id, row.id], function(err){
               if (err) {}
               else {
                 let game_id = this.lastID;
-                let city_list = ['asdf', 'fdsa'];
                 console.log('start random choice');
                 ws_connections.forEach((item) => {
                   if (item.user_id === row.id) {
@@ -133,12 +135,12 @@ app.ws('/', function(ws, req) {
 
                     //random choice
                     if (!!Math.round(Math.random())){
-                      item.send(JSON.stringify({ choice: 1, message: 'city_list', data: gtrends.cities }));
-                      ws.send(JSON.stringify({ choice: 0, message: 'city_list', data: [] }));
+                      item.send(JSON.stringify({ choice: 1, data: gtrends.cities }));
+                      ws.send(JSON.stringify({ choice: 0, data: [] }));
                     }
                     else{
-                      ws.send(JSON.stringify({ choice: 1, message: 'city_list', data: gtrends.cities }));
-                      item.send(JSON.stringify({ choice: 0, message: 'city_list', data: [] }));
+                      ws.send(JSON.stringify({ choice: 1, data: gtrends.cities }));
+                      item.send(JSON.stringify({ choice: 0, data: [] }));
                     }
                   }
                 });
@@ -149,7 +151,6 @@ app.ws('/', function(ws, req) {
         break;
       case 'city selected':        
         db.run(`UPDATE matches SET city = ? WHERE id = ?`, [message.city_id, ws.game_id]);
-
         ws.send(JSON.stringify({ 
           message: 'city selected', 
           data: {
@@ -159,7 +160,7 @@ app.ws('/', function(ws, req) {
         }));
 
         ws_connections.forEach((item) => {
-          if (item.game_id === ws.game_id && item !== ws) {
+          if (item.game_id === ws.game_id && item.user_id !== ws.user_id) {
             item.send(JSON.stringify({ 
               message: 'city selected', 
               data: {

@@ -20,11 +20,19 @@ class Game extends React.Component{
             categories: [],
             winner: -1,
             city: "",
+            isOpenSocket: false,
         };
         this.findGame = this.findGame.bind(this);
         this.onMessageWebSockets = this.onMessageWebSockets.bind(this);
         this.selectCity = this.selectCity.bind(this);
+        this.onOpenWebSocket = this.onOpenWebSocket.bind(this);
     };
+
+    onOpenWebSocket(){
+        this.setState({
+            isOpenSocket: true,
+        });
+    }
 
     selectCity(id_city){
         let obj = {
@@ -55,7 +63,7 @@ class Game extends React.Component{
                 waitOrCity: 0,
                 stage: 3,
                 cities: data.data,
-            }, console.log(main.state));
+            });
         }
         else if (main.state.stage == 3){
             main.setState({
@@ -109,6 +117,7 @@ class Game extends React.Component{
                 <Websocket 
                     url='ws://localhost:8080'
                     onMessage={this.onMessageWebSockets}
+                    onOpen={this.onOpenWebSocket}
                     ref={ Websocket => { this.refWebSocket = Websocket }}
                 />
                 <Row style={{ height: "30%" }}></Row>
@@ -136,7 +145,7 @@ class Game extends React.Component{
                             <Button disabled={!this.props.loginData.login} onClick={this.findGame} variant="info" style={{ display: (this.state.isFindGame || this.state.stage != 0) ? "none" : "inline", width: 250, height: 100, fontSize: 25 }}>Начать игру!</Button> 
                         </OverlayTrigger>
                         :
-                        <Button disabled={!this.props.loginData.login} onClick={this.findGame} variant="info" style={{ display: (this.state.isFindGame || this.state.stage != 0) ? "none" : "inline", width: 250, height: 100, fontSize: 25 }}>Начать игру!</Button>
+                        <Button disabled={!this.props.loginData.login && !this.state.isOpenSocket} onClick={this.findGame} variant="info" style={{ display: (this.state.isFindGame || this.state.stage != 0) ? "none" : "inline", width: 250, height: 100, fontSize: 25 }}>Начать игру!</Button>
                         }
 
                         {(this.state.stage == 1) ? <GameStage1 /> : null}
