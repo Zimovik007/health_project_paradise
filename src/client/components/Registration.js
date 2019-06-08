@@ -61,6 +61,7 @@ class Registration extends React.Component{
                 isLoading: false,
             });
             if (response.ok){
+                console.log("123s");
                 // main.setState({
                 //     login: "",
                 //     password: "",
@@ -123,7 +124,8 @@ class Registration extends React.Component{
             );
         }
         return(
-                <Container>
+                <Container style={{flex: 1, height: '100%' }}>
+                    <Row style={{ height: "10%" }}></Row>
                     <Row>
                         <Col
                             lg={{ span: 8, offset: 2 }}
