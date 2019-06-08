@@ -6,6 +6,7 @@ import Navigation from "./Navigation";
 import Game from "./Game";
 import Login from "./Login";
 import Registration from "./Registration";
+import Logout from "./Logout";
 
 class App extends React.Component{
     constructor(props){
@@ -61,6 +62,7 @@ class App extends React.Component{
                 <Route path="/" exact component={Game} />
                 <Route path="/login" render={() => <Login getLoginData={this.getLoginData} />} />
                 <Route path="/registration" render={() => <Registration getLoginData={this.getLoginData} />} />
+                <Route path="/logout" render={() => <Logout getLoginData={this.getLoginData} />} />
             </Router>
         );
     }

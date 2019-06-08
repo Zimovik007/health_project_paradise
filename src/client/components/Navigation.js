@@ -6,13 +6,18 @@ function Navigation({ login }){
     return(
         <Container>
             <Navbar bg="light" expand="lg">
-                <Navbar.Brand><Link to="./">Health-Project-Paradise</Link></Navbar.Brand>
+                <Navbar.Brand><Link to="./">Health Project Paradise</Link></Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     {(login) 
                     ? 
                         <Nav className="mr-right">
-                            <Link to="./">{login}</Link> 
+                            <Nav.Item as="li">
+                                <Nav.Link><Link to="./">{login}</Link></Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                                <Nav.Link><Link to="./logout">Выйти</Link></Nav.Link>
+                            </Nav.Item>
                         </Nav>
                     :
                         <Nav className="mr-right">
