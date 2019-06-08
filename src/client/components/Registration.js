@@ -1,6 +1,8 @@
 import React from "react";
 import {Container, Row, Col, Form, Button, Alert, } from "react-bootstrap";
 
+import {Route, Redirect} from 'react-router';
+
 
 class Registration extends React.Component{
     constructor(props){
@@ -59,10 +61,17 @@ class Registration extends React.Component{
                 isLoading: false,
             });
             if (response.ok){
-                main.setState({
-                    login: "",
-                    password: "",
-                    isReg: true,
+                // main.setState({
+                //     login: "",
+                //     password: "",
+                //     isReg: true,
+                // });
+                response.json().then(function(data){
+                    main.setState({
+                        login: data.login,
+                        id: data.id,
+                        isReg: true,
+                    });
                 });
             }
           }
@@ -76,7 +85,17 @@ class Registration extends React.Component{
     }
 
     render(){
-        if (this.state.isReg)
+        if (this.state.isReg){
+            this.props.getLoginData({login: this.state.login, id: this.state.id});
+            return(
+                <Redirect push to={{ 
+                    pathname: '/', 
+                    state: {
+                        id: this.state.id,
+                        login: this.state.login,
+                    } 
+                }} />
+            );
             return(
                 <Container>
                     <Row style={{ marginTop: "30px" }}>
@@ -102,6 +121,7 @@ class Registration extends React.Component{
                     </Row>
                 </Container>
             );
+        }
         return(
                 <Container>
                     <Row>

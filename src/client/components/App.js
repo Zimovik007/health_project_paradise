@@ -10,15 +10,57 @@ import Registration from "./Registration";
 class App extends React.Component{
     constructor(props){
         super(props);
+
+        this.state = {
+            loginLogin: "",
+            loginId: "",
+        };
+
+        this.getLoginData = this.getLoginData.bind(this);
+    }
+
+    componentWillMount(){
+        const main = this;
+        fetch('/get_user',
+        {
+            method: 'post',
+            headers: {
+                'Content-Type':'application/json',
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+            }
+        })
+        .then(function(response) {
+            response.json().then(function(data){
+                if (data.login && data.id){
+                    main.setState({
+                        loginLogin: data.login,
+                        loginId: data.id,
+                    });
+                }
+            });
+        })
+        .catch(function(err) {
+            main.setState({
+                isLoading: false,
+            });
+        });
+    }
+
+    getLoginData(obj){
+        this.setState({
+            loginLogin: obj.login,
+            loginId: obj.id,
+        });
     }
 
     render(){
         return(
             <Router>
-                <Navigation />
+                <Navigation login={this.state.loginLogin} />
                 <Route path="/" exact component={Game} />
-                <Route path="/login" component={Login} />
-                <Route path="/registration" component={Registration} />
+                <Route path="/login" render={() => <Login getLoginData={this.getLoginData} />} />
+                <Route path="/registration" render={() => <Registration getLoginData={this.getLoginData} />} />
             </Router>
         );
     }
