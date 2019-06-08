@@ -39,12 +39,12 @@ class GameStage4 extends React.Component{
                 (this.state.waitOrCity == 1) 
                 ?
                     <div>
-                        <h1>Соперник запрещает категории</h1>
+                        <h2>Соперник запрещает категории</h2>
                         <Spinner animation="grow" variant="info" width="150" height="150" style={{ fontSize: 45 }} />
                     </div>
                 :
                     <div>
-                        <h1>У вас есть {this.state.cnt} {(this.state.cnt == 1) ? "клик" : "клика"}, чтобы убрать как можно больше категорий</h1>
+                        <h2>У вас есть {this.state.cnt} {(this.state.cnt == 1) ? "клик" : "клика"}, чтобы убрать как можно больше категорий</h2>
                         <Form>
                             { 
                                 this.state.categories.map((v, i) => <Form.Check onClick={(e) => this.onClickCheckbox(e, i)}type='checkbox' key={i} label={v} className="mb-3" inline />)

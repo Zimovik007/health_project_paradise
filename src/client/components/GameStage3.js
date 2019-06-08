@@ -8,7 +8,7 @@ function GameStage3({ waitOrCity, cities, selectCity }){
             (waitOrCity == 1) 
             ?
                 <div>
-                    <h1>Какой город разыграем?</h1>
+                    <h2>Какой город разыграем?</h2>
                     <Form>
                         <Form.Group controlId="exampleForm.ControlSelect1">
                             <Form.Label>Выберите город:</Form.Label>
@@ -21,7 +21,7 @@ function GameStage3({ waitOrCity, cities, selectCity }){
                 </div>
             :
                 <div>
-                    <h1>Соперник выбирает город</h1>
+                    <h2>Соперник выбирает город</h2>
                     <Spinner animation="grow" variant="info" width="150" height="150" style={{ fontSize: 45 }} />
                 </div>
         }

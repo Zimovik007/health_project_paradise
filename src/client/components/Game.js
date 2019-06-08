@@ -9,6 +9,8 @@ import GameStage3 from './GameStage3';
 import GameStage4 from './GameStage4';
 import GameStage5 from './GameStage5';
 
+import StageInfo from './StageInfo';
+
 
 class Game extends React.Component{
     constructor(props){
@@ -137,7 +139,17 @@ class Game extends React.Component{
                     onOpen={this.onOpenWebSocket}
                     ref={ Websocket => { this.refWebSocket = Websocket }}
                 />
-                <Row style={{ height: "30%" }}></Row>
+                <Row style={{ height: "10%" }}></Row>
+                <Row style={{ height: "20%" }}>
+                    <Col
+                        md={12}
+                        sm={12}
+                        xs={12}
+                        style={{ textAlign: 'center' }}
+                    >
+                        {(this.state.stage >= 4) ? <StageInfo city={this.state.city} deletedCategories={this.state.deletedCategories} /> : null}
+                    </Col>
+                </Row>
                 <Row>
                     <Col
                         md={12}
