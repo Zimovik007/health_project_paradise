@@ -1,0 +1,151 @@
+const googleTrends = require('google-trends-api');
+var NodeGeocoder = require('node-geocoder');
+
+function citiesByDiseases(diseases, threshold, years) {
+  result = {}
+  var cnt = diseases.length;
+  var promises = [];
+  diseases.forEach(disease => {
+    promises.push(
+      googleTrends.interestByRegion({keyword: disease, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (years*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
+        .then((res) => {
+          res = JSON.parse(res);
+          let data = res['default']['geoMapData'];
+          let cities = data.map((obj) => {return obj['geoName']});
+          cities.forEach(city => {
+            if (city in result) {
+              ++result[city];
+            } else {
+              result[city] = 1;
+            }
+          });
+        }).catch((err) => {})
+    );
+  });
+  return Promise.all(promises).then(() => {
+    cities = []
+    for (var key in result) {
+      if (result[key] >= threshold) {
+        cities.push(key);
+      }
+    }
+    return cities;
+  });
+}
+
+// diseases = ["абсцесс", "ангина", "грипп", "гипертония", "сахарный диабет", "язва желудка", "кариес", "аллергии", "СПИД", "туберкулез", "депрессия", "диарея", "гепатит", "ОРВИ"]
+// citiesByDiseases(diseases, 6, 20).then((cities) => {
+//   console.log(cities.sort());
+//   console.log(cities.length);
+// });
+
+function distance(lat1, lon1, lat2, lon2, unit) {
+  if ((lat1 == lat2) && (lon1 == lon2)) {
+    return 0;
+  }
+  else {
+    var radlat1 = Math.PI * lat1/180;
+    var radlat2 = Math.PI * lat2/180;
+    var theta = lon1-lon2;
+    var radtheta = Math.PI * theta/180;
+    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    if (dist > 1) {
+      dist = 1;
+    }
+    dist = Math.acos(dist);
+    dist = dist * 180/Math.PI;
+    dist = dist * 60 * 1.1515;
+    if (unit=="K") { dist = dist * 1.609344 }
+    if (unit=="N") { dist = dist * 0.8684 }
+    return dist;
+  }
+}
+
+function getGeo(city) {
+  let options = {
+    provider: 'openstreetmap',
+    httpAdapter: 'https',
+    language: 'RU',
+  };
+  let geocoder = NodeGeocoder(options);
+  return geocoder.geocode(city)
+    .then(function(res) {
+      return {lat: res[0].latitude, lon: res[0].longitude};
+    })
+    .catch(function(err) {
+    });
+}
+
+function score(city, query) {
+  return googleTrends.interestByRegion({keyword: query, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
+    .then((res) => {
+      res = JSON.parse(res);
+      let data = res['default']['geoMapData'];
+      let scores = {};
+      data.forEach(obj => {
+        scores[obj['geoName']] = obj['value'][0];
+      });
+      // console.log([query, scores[city]]);
+      if (city in scores) {
+        return scores[city];
+      }
+      return 0;
+    }).catch((err) => {
+      return 0;
+    })
+}
+
+function compare(city, query1, query2) {
+  let ar = [0, 0];
+  return Promise.all([
+    score(city, query1).then(score1 => {
+      ar[0] = score1;
+    }),
+    score(city, query2).then(score2 => {
+      ar[1] = score2;
+    })]
+  ).then(() => {
+    if (ar[0] > ar[1]) return query1;
+    if (ar[0] < ar[1]) return query2;
+    return null;
+  });
+}
+
+// compare('Владивосток', "море", "пустыня").then((cmpres) => {
+//   console.log(cmpres);
+// }) --> "пустыня"
+
+function compare_cities(disease, city1, city2) {
+  return googleTrends.interestByRegion({keyword: disease, category: 45, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
+  .then((res) => {
+    res = JSON.parse(res);
+    let score1 = 0;
+    let score2 = 0
+    // console.log(JSON.stringify(res, null, 2));
+    let data = res['default']['geoMapData'];
+    let scores = {};
+    data.forEach(obj => {
+      scores[obj['geoName']] = obj['value'][0];
+    });
+    // console.log(scores);
+    if (city1 in scores) {
+      score1 = scores[city1];
+    }
+    if (city2 in scores) {
+      score2 = scores[city2];
+    };
+    if (score1 > score2) {
+      return city1;
+    }
+    if (score1 < score2) {
+      return city2;
+    }
+    return null;
+  }).catch((err) => {
+    return 0;
+  })
+}
+
+// compare_cities("чесотка", "Москва", "Санкт-Петербург").then(city => {
+//   console.log(city);
+// })
