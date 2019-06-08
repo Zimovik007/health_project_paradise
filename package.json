@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Zimovik007/health_project_paradise/issues"
   },
-  "homepage": "https://github.com/Zimovik007/health_project_paradise#readme"
+  "homepage": "https://github.com/Zimovik007/health_project_paradise#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
