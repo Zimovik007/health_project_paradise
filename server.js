@@ -44,7 +44,7 @@ app.use(session({
       }));
 
 app.use((req, res, next) => {
-  if ((req.url !== '/login' && req.url !== '/register') && !req.session.user_id)
+  if ((req.url !== '/login' && req.url !== '/register') && !req.session.user)
     res.status(401).json({message: 'Unauthentificated'});
   else
     next();
@@ -58,7 +58,7 @@ app.post('/register', (req, res) => {
       res.json({ status: err.message });
     }
     else {
-      req.session.user_id = this.lastID;
+      req.session.user = {id: this.lastID, login: req.body.login};
       res.json({login: req.body.login, id: this.lastID});
     }
   });
@@ -70,10 +70,14 @@ app.post('/login', (req, res) => {
       res.json({ status: err.message });
     }
     else {
-      req.session.user_id = row.id;
+      req.session.user = {id: row.id, login: row.id};
       res.json({login: req.body.login, id: row.id});
     }
   });
+});
+
+app.post('/get_user', (req, res) => {
+  res.json({login: req.session.user.login, id: req.session.user.id});
 });
 
 app.ws('/', function(ws, req) {
