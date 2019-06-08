@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/Zimovik007/health_project_paradise#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "babel-loader": "^8.0.6",
+    "css-loader": "^2.1.1",
+    "express": "^4.17.1",
+    "webpack": "^4.33.0"
   }
 }
