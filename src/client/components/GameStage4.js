@@ -1,6 +1,7 @@
 import React from "react";
 import {Spinner, Form} from "react-bootstrap";
 
+import Countdown from 'react-countdown-now';
 
 class GameStage4 extends React.Component{
     constructor(props){
@@ -11,12 +12,25 @@ class GameStage4 extends React.Component{
             waitOrCity: props.waitOrCity,
             cnt: 3,
             res: [],
+            date: Date.now(),
+            complete: false,
         };
 
+        this.onCompleteTimer = this.onCompleteTimer.bind(this);
         this.onClickCheckbox = this.onClickCheckbox.bind(this);
     }
 
+    onCompleteTimer(){
+        if (this.state.complete)
+            return;
+        this.setState({
+            complete: true,            
+        }, this.props.selectDeletedCategories(this.state.res));
+    }
+
     onClickCheckbox(e, i){
+        if (this.state.complete)
+            return;
         let newCnt = this.state.cnt - 1;
         let newRes = this.state.res;
         if (!newRes.filter(v => v == i).length)
@@ -28,11 +42,16 @@ class GameStage4 extends React.Component{
                 cnt: newCnt,
                 res: newRes,
             });
-        else
+        else{
+            this.setState({
+                complete: true,
+            });
             this.props.selectDeletedCategories(newRes);
+        }
     }
     
     render(){
+        const renderer = ({ seconds, completed }) => <span style={{ marginTop: "30px", fontSize: "25px" }}>{(!this.state.formDisable) ? seconds : null}</span>;
         return(
             <div>
             {
@@ -50,6 +69,7 @@ class GameStage4 extends React.Component{
                                 this.state.categories.map((v, i) => <Form.Check onClick={(e) => this.onClickCheckbox(e, i)}type='checkbox' key={i} label={v} className="mb-3" inline />)
                             }
                         </Form>
+                        <Countdown date={this.state.date + 12000} renderer={renderer} onComplete={this.onCompleteTimer} />            
                     </div>
             }
             </div>
