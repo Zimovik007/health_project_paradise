@@ -10,8 +10,12 @@ function Navigation(){
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav className="mr-right">
-                        <Link to="./login">Login</Link>
-                        <Link to="./registration">Registration</Link>
+                        <Nav.Item as="li">
+                            <Nav.Link><Link to="./login">Вход</Link></Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item as="li">
+                            <Nav.Link><Link to="./registration">Регистрация</Link></Nav.Link>
+                        </Nav.Item>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
