@@ -34,14 +34,14 @@ app.use(express.static('public'));
   // app.use(express.cookieDecoder());
   // app.use(express.session());
 app.use(session({
-        store: new SQLiteStore({
-          db: 'sessions.sqlite3',
-        }),
-        secret: 'asdf',
-        cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // 1 week
-        resave: true,
-        saveUninitialized: true,
-      }));
+  store: new SQLiteStore({
+    db: 'sessions.sqlite3',
+  }),
+  secret: 'asdf',
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // 1 week
+  resave: true,
+  saveUninitialized: true,
+}));
 
 app.use((req, res, next) => {
   if ((req.url !== '/login' && req.url !== '/register') && !req.session.user)
@@ -73,7 +73,7 @@ app.post('/login', (req, res) => {
     else if (row.password !== req.body.password)
       res.json({ status: 'wrong password' });
     else {
-      req.session.user = {id: row.id, login: row.id};
+      req.session.user = {id: row.id, login: req.body.login};
       res.json({login: req.body.login, id: row.id});
     }
   });
@@ -83,12 +83,27 @@ app.post('/get_user', (req, res) => {
   res.json({login: req.session.user.login, id: req.session.user.id});
 });
 
+const ws_connections = [];
+
 app.ws('/', function(ws, req) {
-  ws.on('message', function(msg) {
+  ws_connections.push(ws);
+
+  ws.on('message', (msg) => {
     console.log(msg);
-    console.log('asdf');
+    ws_connections.forEach(function(index, item) {
+      if (item !== ws) { // make sure we're not sending to ourselves
+        item.send(msg);
+      }
+    });
   });
+
   console.log('socket asdf');
+
+  var object = {
+    message: 'welcome to the socket api',
+    time: Date.now().toString()
+  };
+  ws.send(JSON.stringify(object));
 });
 
 app.use((req, res) => {
