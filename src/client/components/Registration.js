@@ -1,5 +1,5 @@
 import React from "react";
-import {Container, Row, Col, Form, Button} from "react-bootstrap";
+import {Container, Row, Col, Form, Button, Alert, } from "react-bootstrap";
 
 
 class Registration extends React.Component{
@@ -8,12 +8,20 @@ class Registration extends React.Component{
         this.state = {
             login: "",
             password: "",
+            isReg: false,
         };
 
         this.onChangeLogin = this.onChangeLogin.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
         this.sendRegistrationForm = this.sendRegistrationForm.bind(this);
+        this.hideSuccessRegistration = this.hideSuccessRegistration.bind(this);
     };
+
+    hideSuccessRegistration(){
+        this.setState({
+            isReg: false,
+        });
+    }
 
     onChangeLogin(e){
         this.setState({
@@ -50,7 +58,13 @@ class Registration extends React.Component{
             main.setState({
                 isLoading: false,
             });
-            console.log(response);
+            if (response.ok){
+                main.setState({
+                    login: "",
+                    password: "",
+                    isReg: true,
+                });
+            }
           }
         )
         .catch(function(err) {
@@ -62,15 +76,41 @@ class Registration extends React.Component{
     }
 
     render(){
+        if (this.state.isReg)
+            return(
+                <Container>
+                    <Row style={{ marginTop: "30px" }}>
+                        <Col
+                            lg={{ span: 8, offset: 2 }}
+                            md={{ span: 8, offset: 2 }}
+                            sm={12}
+                            xs={12}
+                        >
+                            <Alert show={this.state.show} variant="success">
+                                <Alert.Heading>Успешная регистрация!</Alert.Heading>
+                                <p>
+                                    Вы были успешно зарегистрированы в игре и можете войти в свой аккаунт, перейдя во вкладку "Вход"
+                                </p>
+                                <hr />
+                                <div className="d-flex justify-content-end">
+                                    <Button onClick={this.hideSuccessRegistration} variant="outline-success">
+                                        Понятно!
+                                    </Button>
+                                </div>
+                            </Alert> 
+                        </Col>
+                    </Row>
+                </Container>
+            );
         return(
-            <Container>
-                <Row>
-                    <Col
-                        lg={{ span: 8, offset: 2 }}
-                        md={{ span: 8, offset: 2 }}
-                        sm={12}
-                        xs={12}
-                    >
+                <Container>
+                    <Row>
+                        <Col
+                            lg={{ span: 8, offset: 2 }}
+                            md={{ span: 8, offset: 2 }}
+                            sm={12}
+                            xs={12}
+                        >
                         <Form>
                             <Form.Group controlId="formBasicLogin">
                                 <Form.Label>Логин</Form.Label>
@@ -79,7 +119,6 @@ class Registration extends React.Component{
                                     Ваш логин будет виден всем пользователям
                                 </Form.Text>
                             </Form.Group>
-
                             <Form.Group controlId="formBasicPassword">
                                 <Form.Label>Пароль</Form.Label>
                                 <Form.Control type="password" placeholder="Введите пароль" value={this.state.password} onChange={this.onChangePassword} />
