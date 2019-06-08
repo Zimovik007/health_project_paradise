@@ -3,6 +3,10 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('db.sqlite3');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
+
+
 const port = process.env.PORT || 8080;
 
 db.serialize(function() {
@@ -27,16 +31,36 @@ const expressWs = require('express-ws')(app);
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(express.static('public'));
+  // app.use(express.cookieDecoder());
+  // app.use(express.session());
+app.use(session({
+        store: new SQLiteStore({
+          db: 'sessions.sqlite3',
+        }),
+        secret: 'asdf',
+        cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // 1 week
+        resave: true,
+        saveUninitialized: true,
+      }));
 
+app.use((req, res, next) => {
+  if ((req.url !== '/login' && req.url !== '/register') && !req.session.user_id)
+    res.status(401).json({message: 'Unauthentificated'});
+  else
+    next();
+});
 
 app.post('/register', (req, res) => {
   // TODO: validation
-  console.log(req.body.login);
-  db.run(`INSERT INTO users(login, password) VALUES(?, ?)`, [req.body.login, req.body.password], function(err) {
+
+  db.run(`INSERT INTO users(login, password) VALUES(?, ?)`, [req.body.login, req.body.password], (err) => {
     if (err) {
-      res.json({ status: 'error' });
+      res.json({ status: err.message });
     }
-    res.json({ status: 'ok' });
+    else {
+      req.session.user_id = this.lastID;
+      res.json({ status: 'ok' });
+    }
   });
   // db.get(sql, [playlistId], (err, row) => {
   //   if (err) {
@@ -65,3 +89,5 @@ app.use((req, res) => {
 app.listen(port, () => {
       console.log(`server is listening on ${port}`);
 });
+
+//45.67.57.145

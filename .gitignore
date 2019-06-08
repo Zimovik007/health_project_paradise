@@ -88,3 +88,4 @@ typings/
 .dynamodb/
 
 db.sqlite3
+sessions.sqlite3
