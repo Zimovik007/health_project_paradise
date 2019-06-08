@@ -59,7 +59,7 @@ class App extends React.Component{
         return(
             <Router>
                 <Navigation login={this.state.loginLogin} />
-                <Route path="/" exact component={Game} />
+                <Route path="/" exact render={() => <Game loginData={{login: this.state.loginLogin, id: this.state.loginId}} />} />
                 <Route path="/login" render={() => <Login getLoginData={this.getLoginData} />} />
                 <Route path="/registration" render={() => <Registration getLoginData={this.getLoginData} />} />
                 <Route path="/logout" render={() => <Logout getLoginData={this.getLoginData} />} />

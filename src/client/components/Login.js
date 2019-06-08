@@ -90,7 +90,8 @@ class Login extends React.Component{
             );
         }
         return(
-            <Container>
+            <Container style={{flex: 1, height: '100%' }}>
+                <Row style={{ height: "10%" }}></Row>
                 <Row>
                     <Col
                         lg={{ span: 8, offset: 2 }}
