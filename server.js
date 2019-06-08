@@ -23,7 +23,7 @@ app.use(express.static('public'));
 app.post('/register', (req, res) => {
   // TODO: validation
 
-  res.sendFile('./public/index.html');
+  res.sendFile('./public/index.html', { root: __dirname });
 });
 
 app.ws('/', function(ws, req) {
