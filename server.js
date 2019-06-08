@@ -79,8 +79,12 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.post('/logout', (req, res) => {
+  req.session.user = undefined;
+  res.status(200).json({message: 'logged out'});
+});
+
 app.post('/get_user', (req, res) => {
-  console.log(req.session);
   res.json({login: req.session.user.login, id: req.session.user.id});
 });
 
