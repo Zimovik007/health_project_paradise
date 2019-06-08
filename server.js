@@ -6,8 +6,17 @@ const bodyParser = require('body-parser');
 const port = process.env.PORT || 8080;
 
 db.serialize(function() {
-    db.run("CREATE TABLE IF NOT EXISTS counts (key TEXT, value INTEGER)");
-    db.run("INSERT INTO counts (key, value) VALUES (?, ?)", "counter", 0);
+  db.run(
+    'CREATE TABLE IF NOT EXISTS "users" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `login` TEXT NOT NULL UNIQUE, `password` TEXT, `points` INTEGER DEFAULT 0 )'
+  );
+
+  db.run(
+    'CREATE TABLE IF NOT EXISTS `cards` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `title` TEXT )'
+  );
+
+  db.run(
+    'CREATE TABLE IF NOT EXISTS "user_cards" ( `id_user` INTEGER, `id_card` INTEGER, FOREIGN KEY(`id_card`) REFERENCES `cards`(`id`), FOREIGN KEY(`id_user`) REFERENCES `user`(`id`) )'
+  );
 });
 
 // create the server
@@ -22,8 +31,23 @@ app.use(express.static('public'));
 
 app.post('/register', (req, res) => {
   // TODO: validation
+  console.log(req.body.login);
+  db.run(`INSERT INTO users(login, password) VALUES(?, ?)`, [req.body.login, req.body.password], function(err) {
+    if (err) {
+      res.json({ status: 'error' });
+    }
+    res.json({ status: 'ok' });
+  });
+  // db.get(sql, [playlistId], (err, row) => {
+  //   if (err) {
+  //     return console.error(err.message);
+  //   }
+  //   return row
+  //     ? console.log(row.id, row.name)
+  //     : console.log(`No playlist found with the id ${playlistId}`);
+   
+  // });
 
-  res.sendFile('./public/index.html', { root: __dirname });
 });
 
 app.ws('/', function(ws, req) {
