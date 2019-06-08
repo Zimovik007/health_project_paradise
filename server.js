@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 
+const gtrends = require('./gtrends.js');
+
 
 const port = process.env.PORT || 8080;
 
@@ -101,7 +103,7 @@ app.ws('/', function(ws, req) {
 
   ws.on('message', (msg) => {
     console.log(msg);
-    let category_list = ['qwer', 'rewq'];
+    let category_list = ['Памятники природы', 'Университеты', 'Районы', 'Реки', 'Животные', 'Болезни', 'Места исторического значения', 'Футбол', 'Хоккей', 'Баскетбол'];
     let message = JSON.parse(msg);
     switch (message.message) {
       case 'game start':
@@ -131,12 +133,12 @@ app.ws('/', function(ws, req) {
 
                     //random choice
                     if (!!Math.round(Math.random())){
-                      item.send(JSON.stringify({ choice: 1, message: 'city_list', data: city_list }));
-                      ws.send(JSON.stringify({ choice: 0, message: 'city_list', data: city_list }));
+                      item.send(JSON.stringify({ choice: 1, message: 'city_list', data: gtrends.cities }));
+                      ws.send(JSON.stringify({ choice: 0, message: 'city_list', data: [] }));
                     }
                     else{
-                      ws.send(JSON.stringify({ choice: 1, message: 'city_list', data: city_list }));
-                      item.send(JSON.stringify({ choice: 0, message: 'city_list', data: city_list }));
+                      ws.send(JSON.stringify({ choice: 1, message: 'city_list', data: gtrends.cities }));
+                      item.send(JSON.stringify({ choice: 0, message: 'city_list', data: [] }));
                     }
                   }
                 });
@@ -148,16 +150,23 @@ app.ws('/', function(ws, req) {
       case 'city selected':        
         db.run(`UPDATE matches SET city = ? WHERE id = ?`, [message.city_id, ws.game_id]);
 
-        let city_list = ['asdf', 'fdsa'];
-
-        ws.send(JSON.stringify({message: 'city selected', data: city_list[message.city_id]}));
+        ws.send(JSON.stringify({ 
+          message: 'city selected', 
+          data: {
+            city: gtrends.cities[message.city_id],
+            category_list: category_list,
+          }
+        }));
 
         ws_connections.forEach((item) => {
           if (item.game_id === ws.game_id && item !== ws) {
-            item.send(JSON.stringify({message: 'city selected', data: {
-              city: city_list[message.city_id],
-              category_list: category_list,
-            }}));
+            item.send(JSON.stringify({ 
+              message: 'city selected', 
+              data: {
+                city: gtrends.cities[message.city_id],
+                category_list: category_list,
+              }
+            }));
           }
         });
         break;

@@ -6,6 +6,7 @@ import Websocket from 'react-websocket';
 import GameStage1 from './GameStage1';
 import GameStage2 from './GameStage2';
 import GameStage3 from './GameStage3';
+import GameStage4 from './GameStage4';
 
 
 class Game extends React.Component{
@@ -18,11 +19,20 @@ class Game extends React.Component{
             cities: [],
             categories: [],
             winner: -1,
-            // socket: new WebSocket("ws://localhost:8080"),
+            city: "",
         };
         this.findGame = this.findGame.bind(this);
         this.onMessageWebSockets = this.onMessageWebSockets.bind(this);
+        this.selectCity = this.selectCity.bind(this);
     };
+
+    selectCity(id_city){
+        let obj = {
+            message: "city selected",
+            city_id: id_city.target.value,
+        };
+        this.refWebSocket.sendMessage(JSON.stringify(obj)); 
+    }
 
     onMessageWebSockets(data){
         const main = this;
@@ -33,54 +43,50 @@ class Game extends React.Component{
             });
         }
         data = JSON.parse(data);
-        if (data.choice == 1 && main.state.stage == 1){
+        if (data.choice && main.state.stage == 1){
             main.setState({
                 stage: 3, 
-                waitOrCity: data.choice,
+                waitOrCity: 1,
                 cities: data.data,
             });
         }
-        else if (data.choice == 0 && main.state.stage == 1){
-            main.stage({
-                waitOrCity: data.choice,
-                stage: 3,
-            });
-        }
-        else if (main.state.stage == 2){
+        else if (main.state.stage == 1){
             main.setState({
-                cities: data,
+                waitOrCity: 0,
                 stage: 3,
-            });
+                cities: data.data,
+            }, console.log(main.state));
         }
         else if (main.state.stage == 3){
             main.setState({
-                city: data,
+                city: data.data.city,
+                categories: data.data.category_list,
                 stage: 4,
             });
         }
-        else if (main.state.stage == 4 && !main.state.waitOrCity){
-            main.setState({
-                categories: data,
-                stage: 5,
-            });
-        }
-        else if (main.state.stage == 4 && main.state.waitOrCity){
-            main.setState({
-                deletedCategories: data,
-                stage: 6,
-            });
-        }
-        else if (main.state.stage == 5){
-            main.setState({
-                deletedCategories: data,
-                stage: 6,
-            });
-        }
-        else if (main.state.stage == 6){
-            main.setState({
-                winner: data,
-            });
-        }
+        // else if (main.state.stage == 4 && !main.state.waitOrCity){
+        //     main.setState({
+        //         categories: data,
+        //         stage: 5,
+        //     });
+        // }
+        // else if (main.state.stage == 4 && main.state.waitOrCity){
+        //     main.setState({
+        //         deletedCategories: data,
+        //         stage: 6,
+        //     });
+        // }
+        // else if (main.state.stage == 5){
+        //     main.setState({
+        //         deletedCategories: data,
+        //         stage: 6,
+        //     });
+        // }
+        // else if (main.state.stage == 6){
+        //     main.setState({
+        //         winner: data,
+        //     });
+        // }
     }
 
     findGame(){
@@ -135,7 +141,8 @@ class Game extends React.Component{
 
                         {(this.state.stage == 1) ? <GameStage1 /> : null}
                         {(this.state.stage == 2) ? <GameStage2 /> : null}
-                        {(this.state.stage == 3) ? <GameStage3 waitOrCity={this.state.waitOrCity} /> : null}
+                        {(this.state.stage == 3) ? <GameStage3 waitOrCity={this.state.waitOrCity} cities={this.state.cities} selectCity={this.selectCity} /> : null}
+                        {(this.state.stage == 4) ? <GameStage4 waitOrCity={this.state.waitOrCity} categories={this.state.categories} /> : null}
                     </Col>
                 </Row>
             </Container>
