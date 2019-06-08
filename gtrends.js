@@ -82,40 +82,49 @@ function score(city, query) {
   return googleTrends.interestByRegion({keyword: query, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
     .then((res) => {
       res = JSON.parse(res);
+      // console.log(query);
+      // console.log(JSON.stringify(res));
       let data = res['default']['geoMapData'];
       let scores = {};
       data.forEach(obj => {
-        scores[obj['geoName']] = obj['value'][0];
+        scores[obj['geoName']] = obj['value'];
       });
       // console.log([query, scores[city]]);
       if (city in scores) {
         return scores[city];
       }
-      return 0;
+      return -1;
     }).catch((err) => {
-      return 0;
+      return -1;
     })
 }
 
 function compare(city, query1, query2) {
-  let ar = [0, 0];
+  let ar = [-1, -1];
+  let ss = null;
   return Promise.all([
     score(city, query1).then(score1 => {
-      ar[0] = score1;
+      ar[0] = score1[0];
     }),
     score(city, query2).then(score2 => {
-      ar[1] = score2;
-    })]
+      ar[1] = score2[0];
+    }),
+    score(city, [query1, query2]).then(score_ => {
+      ss = score_;
+    })
+  ]
   ).then(() => {
     if (ar[0] > ar[1]) return query1;
     if (ar[0] < ar[1]) return query2;
+    if (ss[0] > ss[1]) return query1;
+    if (ss[0] < ss[1]) return query2;
     return null;
   });
 }
 
-// compare('Владивосток', "море", "пустыня").then((cmpres) => {
-//   console.log(cmpres);
-// }) --> "пустыня"
+// compare('Хабаровск', "двгупс", "тогу").then((cmpres) => {
+  // console.log(cmpres);
+// })
 
 function compare_cities(disease, city1, city2) {
   return googleTrends.interestByRegion({keyword: disease, category: 45, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
@@ -151,3 +160,8 @@ function compare_cities(disease, city1, city2) {
 // compare_cities("чесотка", "Москва", "Санкт-Петербург").then(city => {
 //   console.log(city);
 // })
+
+// googleTrends.interestByRegion({keyword: ['биткоин', 'микрозаймы'], hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (5*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
+//   .then((res) => {
+//     console.log(res);
+//   })
