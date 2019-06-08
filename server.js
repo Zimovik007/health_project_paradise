@@ -66,9 +66,12 @@ app.post('/register', (req, res) => {
 
 app.post('/login', (req, res) => {
   db.get('SELECT id, password from users where login = ?', [req.body.login], (err, row) => {
-    if (err) {
+    if (err)
       res.json({ status: err.message });
-    }
+    else if (!row)
+      res.json({ status: 'user not found' });
+    else if (row.password !== req.body.password)
+      res.json({ status: 'wrong password' });
     else {
       req.session.user = {id: row.id, login: row.id};
       res.json({login: req.body.login, id: row.id});
