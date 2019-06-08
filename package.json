@@ -2,11 +2,11 @@
   "name": "health_project_paradise",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./src/client/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1", 
-    "build": "webpack --config webpack.config.js",
-    "watch": "webpack --watch --progress"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js --mode=development",
+    "watch": "webpack --watch --progress --mode=development"
   },
   "repository": {
     "type": "git",
@@ -19,17 +19,27 @@
   },
   "homepage": "https://github.com/Zimovik007/health_project_paradise#readme",
   "dependencies": {
+    "bootstrap": "^4.3.1",
+    "jquery": "^1.9.1",
+    "lodash": "^4.17.11",
+    "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.9",
+    "react-dom": "^16.8.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "babel": "^6.23.0",
-    "babel-loader": "^8.0.6",
-    "css-loader": "^2.1.1",
-    "express": "^4.17.1",
-    "webpack": "^4.33.0",
     "babel-core": "^6.26.3",
+    "babel-loader": "^7.0.6",
     "babel-preset-env": "^1.7.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "css-loader": "^2.1.1",
+    "express": "^4.17.1",
     "style-loader": "^0.23.1",
+    "webpack": "^4.33.0",
     "webpack-cli": "^3.3.3"
   }
 }
