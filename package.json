@@ -2,7 +2,7 @@
   "name": "health_project_paradise",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/client/index.js",
+  "main": "./src/client/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js --mode=development",
@@ -20,11 +20,14 @@
   "homepage": "https://github.com/Zimovik007/health_project_paradise#readme",
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "express": "^4.17.1",
+    "express-ws": "^4.0.0",
     "jquery": "^1.9.1",
     "lodash": "^4.17.11",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.9",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "sqlite3": "^4.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
@@ -37,7 +40,6 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^2.1.1",
-    "express": "^4.17.1",
     "style-loader": "^0.23.1",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.3"
