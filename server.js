@@ -59,19 +59,21 @@ app.post('/register', (req, res) => {
     }
     else {
       req.session.user_id = this.lastID;
-      res.json({ status: 'ok' });
+      res.json({login: req.body.login, id: this.lastID});
     }
   });
-  // db.get(sql, [playlistId], (err, row) => {
-  //   if (err) {
-  //     return console.error(err.message);
-  //   }
-  //   return row
-  //     ? console.log(row.id, row.name)
-  //     : console.log(`No playlist found with the id ${playlistId}`);
-   
-  // });
+});
 
+app.post('/login', (req, res) => {
+  db.get('SELECT id, password from users where login = ?', [req.body.login], (err, row) => {
+    if (err) {
+      res.json({ status: err.message });
+    }
+    else {
+      req.session.user_id = row.id;
+      res.json({login: req.body.login, id: row.id});
+    }
+  });
 });
 
 app.ws('/', function(ws, req) {
