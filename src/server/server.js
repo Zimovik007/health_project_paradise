@@ -16,12 +16,12 @@ const expressWs = require('express-ws')(app);
 
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
+app.post('/register', (req, res) => {
+
   res.sendFile('index.html');
 });
 
-app.post('/register', (req, res) => {
-
+app.get('/', (req, res) => {
   res.sendFile('index.html');
 });
 

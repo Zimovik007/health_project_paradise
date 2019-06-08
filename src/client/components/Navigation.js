@@ -6,7 +6,7 @@ function Navigation(){
     return(
         <Container>
             <Navbar bg="light" expand="lg">
-                <Navbar.Brand href="">Health-Project-Paradise</Navbar.Brand>
+                <Navbar.Brand><Link to="./">Health-Project-Paradise</Link></Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav className="mr-right">
