@@ -80,6 +80,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/get_user', (req, res) => {
+  console.log(req.session);
   res.json({login: req.session.user.login, id: req.session.user.id});
 });
 
