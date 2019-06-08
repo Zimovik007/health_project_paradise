@@ -7,6 +7,7 @@ import GameStage1 from './GameStage1';
 import GameStage2 from './GameStage2';
 import GameStage3 from './GameStage3';
 import GameStage4 from './GameStage4';
+import GameStage5 from './GameStage5';
 
 
 class Game extends React.Component{
@@ -18,6 +19,7 @@ class Game extends React.Component{
             waitOrCity: -1,
             cities: [],
             categories: [],
+            deletedCategories: [],
             winner: -1,
             city: "",
             isOpenSocket: false,
@@ -26,6 +28,7 @@ class Game extends React.Component{
         this.onMessageWebSockets = this.onMessageWebSockets.bind(this);
         this.selectCity = this.selectCity.bind(this);
         this.onOpenWebSocket = this.onOpenWebSocket.bind(this);
+        this.selectDeletedCategories = this.selectDeletedCategories.bind(this);
     };
 
     onOpenWebSocket(){
@@ -38,6 +41,14 @@ class Game extends React.Component{
         let obj = {
             message: "city selected",
             city_id: id_city.target.value,
+        };
+        this.refWebSocket.sendMessage(JSON.stringify(obj)); 
+    }
+
+    selectDeletedCategories(cats){
+        let obj = {
+            message: "categories selected",
+            categories: cats,
         };
         this.refWebSocket.sendMessage(JSON.stringify(obj)); 
     }
@@ -70,6 +81,12 @@ class Game extends React.Component{
                 city: data.data.city,
                 categories: data.data.category_list,
                 stage: 4,
+            });
+        }
+        else if (main.state.stage == 4){
+            main.setState({
+                deletedCategories: data.data,
+                stage: 5,
             });
         }
         // else if (main.state.stage == 4 && !main.state.waitOrCity){
@@ -151,7 +168,8 @@ class Game extends React.Component{
                         {(this.state.stage == 1) ? <GameStage1 /> : null}
                         {(this.state.stage == 2) ? <GameStage2 /> : null}
                         {(this.state.stage == 3) ? <GameStage3 waitOrCity={this.state.waitOrCity} cities={this.state.cities} selectCity={this.selectCity} /> : null}
-                        {(this.state.stage == 4) ? <GameStage4 waitOrCity={this.state.waitOrCity} categories={this.state.categories} /> : null}
+                        {(this.state.stage == 4) ? <GameStage4 waitOrCity={this.state.waitOrCity} categories={this.state.categories} selectDeletedCategories={this.selectDeletedCategories}/> : null}
+                        {(this.state.stage == 5) ? <GameStage5 /> : null}
                     </Col>
                 </Row>
             </Container>
