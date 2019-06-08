@@ -11,8 +11,8 @@ class Game extends React.Component{
         super(props);
         this.state = {
             isFindGame: false,
-            stage: 3,
-            waitOrCity: 1,
+            stage: 0,
+            waitOrCity: -1,
             cities: [],
             categories: [],
             winner: -1,
