@@ -100,6 +100,7 @@ app.ws('/', function(ws, req) {
   ws_connections.push(ws);
 
   ws.on('message', (msg) => {
+    console.log(msg);
     let message = JSON.parse(msg);
     switch (message.message) {
       case 'game start':
