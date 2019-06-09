@@ -196,6 +196,7 @@ app.ws('/', function(ws, req) {
               request_my: message.request,
               request_enemy: row.request,
             }}));
+            ws.close();
             ws_connections.forEach((item) => {
               if (item.game_id === ws.game_id && item !== ws) {
                 item.send(JSON.stringify({message: 'request selected', data: {
@@ -203,6 +204,7 @@ app.ws('/', function(ws, req) {
                   request_my: row.request,
                   request_enemy: message.request,
                 }}));
+                item.close();
               }
             });
           }
