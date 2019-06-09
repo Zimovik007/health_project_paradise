@@ -192,16 +192,24 @@ app.ws('/', function(ws, req) {
           if (row.request) {
             //let city_list = ['asdf', 'fdsa'];
             let ans = await gtrends.compare(gtrends.cities[row.city], message.request, row.request);
+
             ws.send(JSON.stringify({message: 'request selected', data: {
-              winner: ans,
+              winner: ans.winner,
+              first: ans.first,
+              second: ans.second,
+              is_abs: ans.is_abs,
               request_my: message.request,
               request_enemy: row.request,
             }}));
             ws.close();
+
             ws_connections.forEach((item) => {
               if (item.game_id === ws.game_id && item !== ws) {
                 item.send(JSON.stringify({message: 'request selected', data: {
-                  winner: -1 * ans,
+                  winner: -1 * ans.winner,
+                  first: ans.second,
+                  second: ans.first,
+                  is_abs: ans.is_abs,
                   request_my: row.request,
                   request_enemy: message.request,
                 }}));
@@ -285,7 +293,9 @@ app.ws('/', function(ws, req) {
           if (row.request) {
             gtrends.compare_cities(gtrends.diseases[row.categories], gtrends.cities[message.city_id], gtrends.diseases[row.city]).then(ans => {
               ws.send(JSON.stringify({message: 'health city selected', data: {
-                winner: ans,
+                winner: ans.winner,
+                first: ans.first,
+                second: ans.second,
                 request_my: gtrends.cities[message.city_id],
                 request_enemy: gtrends.diseases[row.city],
               }}));
@@ -293,7 +303,9 @@ app.ws('/', function(ws, req) {
               ws_connections.forEach((item) => {
                 if (item.game_id === ws.game_id && item !== ws) {
                   item.send(JSON.stringify({message: 'request selected', data: {
-                    winner: -1 * ans,
+                    winner: -1 * ans.winner,
+                    first: ans.second,
+                    second: ans.first,
                     request_my: gtrends.diseases[row.city],
                     request_enemy: gtrends.cities[message.city_id],
                   }}));
