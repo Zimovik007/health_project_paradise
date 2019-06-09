@@ -215,6 +215,99 @@ app.ws('/', function(ws, req) {
 
         });
         break;
+
+      //health
+      case 'health game start':
+        ws.user_id = message.id;
+        db.get('SELECT id FROM users WHERE searching = 1 LIMIT 1', [], (err, row) => {
+          if (err || !row) {
+            db.run(`UPDATE users SET searching = 1 WHERE id = ?`, [message.id]);
+            return;
+          }
+          else {
+            db.run(`UPDATE users SET searching = 0 WHERE id = ?`, [row.id]);
+
+            let stmt = db.prepare(`INSERT INTO matches(id_first, id_second) VALUES(?, ?)`);
+            stmt.run([message.id, row.id], function(err){
+              if (err) {}
+              else {
+                let game_id = this.lastID;
+                console.log('start random choice');
+                ws_connections.forEach((item) => {
+                  if (item.user_id === row.id) {
+                    item.game_id = game_id;
+                    ws.game_id = game_id;
+                    
+                    //game found
+                    item.send("game found");
+                    ws.send("game found");
+
+                    //random choice
+                    if (!!Math.round(Math.random())){
+                      item.send(JSON.stringify({ choice: 1, data: gtrends.diseases }));
+                      ws.send(JSON.stringify({ choice: 0, data: [] }));
+                    }
+                    else{
+                      ws.send(JSON.stringify({ choice: 1, data: gtrends.diseases }));
+                      item.send(JSON.stringify({ choice: 0, data: [] }));
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
+        break;
+      case 'health disease selected':        
+        db.run(`UPDATE matches SET categories = ? WHERE id = ?`, [message.disease_id, ws.game_id]);
+        ws.send(JSON.stringify({ 
+          message: 'helth disease selected', 
+          data: {
+            disease: gtrends.diseases[message.disease_id],
+            cities_list: gtrends.cities,
+          }
+        }));
+
+        ws_connections.forEach((item) => {
+          if (item.game_id === ws.game_id && item.user_id !== ws.user_id) {
+            item.send(JSON.stringify({ 
+              message: 'helth disease selected', 
+              data: {
+                disease: gtrends.diseases[message.disease_id],
+                cities_list: gtrends.cities,
+              }
+            }));
+          }
+        });
+        break;
+      case 'health city selected':
+        db.get('SELECT categories, city FROM matches WHERE id = ?', [ws.game_id], async (err, row) => {
+          if (row.request) {
+            gtrends.compare_cities(gtrends.diseases[row.categories], gtrends.cities[message.city_id], gtrends.diseases[row.city]).then(ans => {
+              ws.send(JSON.stringify({message: 'health city selected', data: {
+                winner: ans,
+                request_my: gtrends.cities[message.city_id],
+                request_enemy: gtrends.diseases[row.city],
+              }}));
+              ws.close();
+              ws_connections.forEach((item) => {
+                if (item.game_id === ws.game_id && item !== ws) {
+                  item.send(JSON.stringify({message: 'request selected', data: {
+                    winner: -1 * ans,
+                    request_my: gtrends.diseases[row.city],
+                    request_enemy: gtrends.cities[message.city_id],
+                  }}));
+                  item.close();
+                }
+              });
+            });            
+          }
+          else {
+            db.run(`UPDATE matches SET city = ? WHERE id = ?`, [message.city_id, ws.game_id]);
+          }
+
+        });
+        break;
       default:
         break;
     }

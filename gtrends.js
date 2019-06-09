@@ -34,7 +34,7 @@ function citiesByDiseases(diseases, threshold, years) {
   });
 }
 
-// diseases = ["абсцесс", "ангина", "грипп", "гипертония", "сахарный диабет", "язва желудка", "кариес", "аллергии", "СПИД", "туберкулез", "депрессия", "диарея", "гепатит", "ОРВИ"]
+exports.diseases = ["абсцесс", "ангина", "грипп", "гипертония", "сахарный диабет", "язва желудка", "кариес", "аллергии", "СПИД", "туберкулез", "депрессия", "диарея", "гепатит", "ОРВИ"];
 // citiesByDiseases(diseases, 4, 20).then((cities) => {
   // console.log(cities.sort());
   // console.log(cities.length);
@@ -151,12 +151,12 @@ function compare_cities(disease, city1, city2) {
       score2 = scores[city2];
     };
     if (score1 > score2) {
-      return city1;
+      return 1;
     }
     if (score1 < score2) {
-      return city2;
+      return -1;
     }
-    return null;
+    return 0;
   }).catch((err) => {
     return 0;
   })
