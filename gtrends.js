@@ -119,11 +119,22 @@ exports.compare = async function(city, query1, query2) {
   //   })
   // ]
   // ).then(() => {
-    if (ar[0] > ar[1]) return 1;
-    if (ar[0] < ar[1]) return -1;
-    if (ss[0] > ss[1]) return 1;
-    if (ss[0] < ss[1]) return -1;
-    return 0;
+    let obj = {
+      first: ar[0],
+      second: ar[1],
+      is_abs: false,
+      winner: ar[0] > ar[1] ? 1 : -1
+    };
+    if (ar[0] != ar[1]) return obj;
+    obj = {
+      first: ss[0],
+      second: ss[1],
+      is_abs: true,
+      winner: ss[0] > ss[1] ? 1 : -1
+    };
+    if (ss[0] != ss[1]) return obj;
+    obj.winner = 0;
+    return obj;
   // });
 }
 
@@ -150,15 +161,14 @@ exports.compare_cities = function(disease, city1, city2) {
     if (city2 in scores) {
       score2 = scores[city2];
     };
-    if (score1 > score2) {
-      return 1;
-    }
-    if (score1 < score2) {
-      return -1;
-    }
-    return 0;
+    let obj_ = {
+      first: score1,
+      second: score2,
+      winner: score1 == score2 ? 0 : (score1 > score2 ? 1 : -1)
+    };
+    return obj_;
   }).catch((err) => {
-    return 0;
+    return {winner: 0};
   })
 }
 
