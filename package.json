@@ -5,7 +5,7 @@
   "main": "./src/client/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.js --mode=development",
+    "build": "webpack --config webpack.config.js --mode=production",
     "watch": "webpack --watch --progress --mode=development"
   },
   "repository": {

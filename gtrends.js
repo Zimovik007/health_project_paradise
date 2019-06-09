@@ -81,6 +81,8 @@ function getGeo(city) {
 function score(city, query) {
   return googleTrends.interestByRegion({keyword: query, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
     .then((res) => {
+      console.log("res   ============    " + query);
+      console.log(res);
       res = JSON.parse(res);
       // console.log(query);
       // console.log(JSON.stringify(res));
@@ -102,24 +104,27 @@ function score(city, query) {
 exports.compare = async function(city, query1, query2) {
   let ar = [-1, -1];
   let ss = null;
-  return Promise.all([
-    score(city, query1).then(score1 => {
-      ar[0] = score1[0];
-    }),
-    score(city, query2).then(score2 => {
-      ar[1] = score2[0];
-    }),
-    score(city, [query1, query2]).then(score_ => {
-      ss = score_;
-    })
-  ]
-  ).then(() => {
+  ar[0] = await score(city, query1)[0];
+  ar[1] = await score(city, query2)[0];
+  ss = await score(city, [query1, query2]);
+  // return Promise.all([
+  //   score(city, query1).then(score1 => {
+  //     ar[0] = score1[0];
+  //   }),
+  //   score(city, query2).then(score2 => {
+  //     ar[1] = score2[0];
+  //   }),
+  //   score(city, [query1, query2]).then(score_ => {
+  //     ss = score_;
+  //   })
+  // ]
+  // ).then(() => {
     if (ar[0] > ar[1]) return 1;
     if (ar[0] < ar[1]) return -1;
     if (ss[0] > ss[1]) return 1;
     if (ss[0] < ss[1]) return -1;
     return 0;
-  });
+  // });
 }
 
 // compare('Хабаровск', "двгупс", "тогу").then((cmpres) => {

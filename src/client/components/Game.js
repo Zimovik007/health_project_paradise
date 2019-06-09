@@ -97,18 +97,6 @@ class Game extends React.Component{
                 stage: 5,
             });
         }
-        // else if (main.state.stage == 4 && !main.state.waitOrCity){
-        //     main.setState({
-        //         categories: data,
-        //         stage: 5,
-        //     });
-        // }
-        // else if (main.state.stage == 4 && main.state.waitOrCity){
-        //     main.setState({
-        //         deletedCategories: data,
-        //         stage: 6,
-        //     });
-        // }
         else if (main.state.stage == 5){
             console.log(data);
             main.setState({
@@ -118,11 +106,6 @@ class Game extends React.Component{
                 stage: 6,
             });
         }
-        // else if (main.state.stage == 6){
-        //     main.setState({
-        //         winner: data,
-        //     });
-        // }
     }
 
     findGame(){
