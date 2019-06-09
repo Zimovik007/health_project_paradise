@@ -192,6 +192,7 @@ app.ws('/', function(ws, req) {
           if (row.request) {
             //let city_list = ['asdf', 'fdsa'];
             let ans = await gtrends.compare(gtrends.cities[row.city], message.request, row.request);
+            console.log(ans);
 
             ws.send(JSON.stringify({message: 'request selected', data: {
               winner: ans.winner,
@@ -292,6 +293,7 @@ app.ws('/', function(ws, req) {
         db.get('SELECT categories, city FROM matches WHERE id = ?', [ws.game_id], async (err, row) => {
           if (row.city) {
             gtrends.compare_cities(gtrends.diseases[row.categories], gtrends.cities[message.city_id], gtrends.diseases[row.city]).then(ans => {
+              console.log(ans);
               ws.send(JSON.stringify({message: 'health city selected', data: {
                 winner: ans.winner,
                 first: ans.first,

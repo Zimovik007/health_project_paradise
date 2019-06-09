@@ -81,8 +81,6 @@ function getGeo(city) {
 function score(city, query) {
   return googleTrends.interestByRegion({keyword: query, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
     .then((res) => {
-      console.log("res   ============    " + query);
-      console.log(res);
       res = JSON.parse(res);
       // console.log(query);
       // console.log(JSON.stringify(res));

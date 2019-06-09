@@ -16,6 +16,7 @@ import GameStageHealth3 from './GameStageHealth3';
 import GameStageHealth4 from './GameStageHealth4';
 
 import StageInfo from './StageInfo';
+import StageInfoHealth from './StageInfoHealth';
 
 
 class Game extends React.Component{
@@ -35,6 +36,9 @@ class Game extends React.Component{
             city: "",
             isOpenSocket: false,
             healthGame: false,
+            first: -1,
+            second: -1,
+            isAbs: false,
         };
         this.findGame = this.findGame.bind(this);
         this.onMessageWebSockets = this.onMessageWebSockets.bind(this);
@@ -133,6 +137,9 @@ class Game extends React.Component{
                     winner: data.data.winner,
                     r_my: data.data.request_my,
                     r_en: data.data.request_enemy,
+                    first: data.data.first,
+                    second: data.data.second,
+                    isAbs: data.data.is_abs,
                     stage: 6,
                 });
             }
@@ -172,6 +179,8 @@ class Game extends React.Component{
                     winner: data.data.winner,
                     r_my: data.data.request_my,
                     r_en: data.data.request_enemy,
+                    first: data.data.first,
+                    second: data.data.second,
                     stageHealth: 4,
                 });
             }
@@ -211,7 +220,7 @@ class Game extends React.Component{
         return(
             <Container style={{flex: 1, height: '100%' }}>
                 <Websocket 
-                    url='ws://localhost:8000'
+                    url='ws://localhost:8080'
                     onMessage={this.onMessageWebSockets}
                     onOpen={this.onOpenWebSocket}
                     ref={ Websocket => { this.refWebSocket = Websocket }}
@@ -225,7 +234,7 @@ class Game extends React.Component{
                         style={{ textAlign: 'center' }}
                     >
                         {(this.state.stage >= 4) ? <StageInfo city={this.state.city} deletedCategories={this.state.deletedCategories} /> : null}
-                        {(this.state.stage >= 3) ? <StageInfoHealth disease={this.state.disease} /> : null}
+                        {(this.state.stageHealth >= 3) ? <StageInfoHealth disease={this.state.disease} /> : null}
 
 
                     </Col>
@@ -268,12 +277,12 @@ class Game extends React.Component{
                         {(this.state.stage == 3) ? <GameStage3 waitOrCity={this.state.waitOrCity} cities={this.state.cities} selectCity={this.selectCity} /> : null}
                         {(this.state.stage == 4) ? <GameStage4 waitOrCity={this.state.waitOrCity} categories={this.state.categories} selectDeletedCategories={this.selectDeletedCategories}/> : null}
                         {(this.state.stage == 5) ? <GameStage5 onFinishGame={this.onFinishGame}/> : null}
-                        {(this.state.stage == 6) ? <GameStage6 winner={this.state.winner} request_my={this.state.r_my} request_enemy={this.state.r_en} /> : null}
+                        {(this.state.stage == 6) ? <GameStage6 winner={this.state.winner} request_my={this.state.r_my} request_enemy={this.state.r_en} first={this.state.first} second={this.state.second} isAbs={this.state.isAbs} /> : null}
 
                         {(this.state.stageHealth == 1) ? <GameStageHealth1 /> : null}
                         {(this.state.stageHealth == 2) ? <GameStageHealth2 waitOrCity={this.state.waitOrCity} diseases={this.state.diseases} selectDisease={this.selectDisease} /> : null}
                         {(this.state.stageHealth == 3) ? <GameStageHealth3 waitOrCity={this.state.waitOrCity} cities={this.state.cities} selectCity={this.selectCityHealth}/> : null}
-                        {(this.state.stageHealth == 4) ? <GameStageHealth4 winner={this.state.winner} request_my={this.state.r_my} request_enemy={this.state.r_en} /> : null}
+                        {(this.state.stageHealth == 4) ? <GameStageHealth4 winner={this.state.winner} request_my={this.state.r_my} request_enemy={this.state.r_en} first={this.state.first} second={this.state.second} /> : null}
 
                     </Col>
                 </Row>
