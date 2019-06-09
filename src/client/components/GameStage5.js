@@ -28,6 +28,11 @@ class GameStage5 extends React.Component{
         this.setState({
             formDisable: true,
         });
+        let obj = {
+            message: 'request selected',
+            request: this.state.query,
+        };
+        this.props.onFinishGame(obj);
     }
     
     render(){

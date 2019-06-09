@@ -99,7 +99,7 @@ function score(city, query) {
     })
 }
 
-function compare(city, query1, query2) {
+exports.compare = async function(city, query1, query2) {
   let ar = [-1, -1];
   let ss = null;
   return Promise.all([

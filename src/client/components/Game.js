@@ -8,6 +8,7 @@ import GameStage2 from './GameStage2';
 import GameStage3 from './GameStage3';
 import GameStage4 from './GameStage4';
 import GameStage5 from './GameStage5';
+import GameStage6 from './GameStage6';
 
 import StageInfo from './StageInfo';
 
@@ -31,12 +32,17 @@ class Game extends React.Component{
         this.selectCity = this.selectCity.bind(this);
         this.onOpenWebSocket = this.onOpenWebSocket.bind(this);
         this.selectDeletedCategories = this.selectDeletedCategories.bind(this);
+        this.onFinishGame = this.onFinishGame.bind(this);
     };
 
     onOpenWebSocket(){
         this.setState({
             isOpenSocket: true,
         });
+    }
+
+    onFinishGame(obj){
+        this.refWebSocket.sendMessage(JSON.stringify(obj));
     }
 
     selectCity(id_city){
@@ -103,12 +109,15 @@ class Game extends React.Component{
         //         stage: 6,
         //     });
         // }
-        // else if (main.state.stage == 5){
-        //     main.setState({
-        //         deletedCategories: data,
-        //         stage: 6,
-        //     });
-        // }
+        else if (main.state.stage == 5){
+            console.log(data);
+            main.setState({
+                winner: data.data.winner,
+                r_my: data.data.request_my,
+                r_en: data.data.request_enemy,
+                stage: 6,
+            });
+        }
         // else if (main.state.stage == 6){
         //     main.setState({
         //         winner: data,
@@ -181,7 +190,8 @@ class Game extends React.Component{
                         {(this.state.stage == 2) ? <GameStage2 /> : null}
                         {(this.state.stage == 3) ? <GameStage3 waitOrCity={this.state.waitOrCity} cities={this.state.cities} selectCity={this.selectCity} /> : null}
                         {(this.state.stage == 4) ? <GameStage4 waitOrCity={this.state.waitOrCity} categories={this.state.categories} selectDeletedCategories={this.selectDeletedCategories}/> : null}
-                        {(this.state.stage == 5) ? <GameStage5 /> : null}
+                        {(this.state.stage == 5) ? <GameStage5 onFinishGame={this.onFinishGame}/> : null}
+                        {(this.state.stage == 6) ? <GameStage6 winner={this.state.winner} request_my={this.state.r_my} request_enemy={this.state.r_en} /> : null}
                     </Col>
                 </Row>
             </Container>

@@ -7,7 +7,7 @@ const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 
 const gtrends = require('./gtrends.js');
-const compare = require('./gtrends.js').compare;
+// const compare = require('./gtrends.js').compare;
 // export compare from './gtrends.js';
 
 
@@ -18,6 +18,7 @@ db.serialize(function() {
     'CREATE TABLE IF NOT EXISTS "users" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `login` TEXT NOT NULL UNIQUE, `password` TEXT, `points` INTEGER DEFAULT 0, `searching` INTEGER DEFAULT 0 )'
   );
 
+  db.run(`UPDATE users SET searching = 0`, []);
   db.run(
     'CREATE TABLE IF NOT EXISTS `cards` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `title` TEXT )'
   );
@@ -186,11 +187,11 @@ app.ws('/', function(ws, req) {
         });
         break;
       case 'request selected':
-        db.get('SELECT request, city FROM matches WHERE id = ?', [ws.game_id], (err, row) => {
+        db.get('SELECT request, city FROM matches WHERE id = ?', [ws.game_id], async (err, row) => {
 
           if (row.request) {
             //let city_list = ['asdf', 'fdsa'];
-            let ans = compare(gtrends.cities[row.city], message.request, row.request);
+            let ans = await gtrends.compare(gtrends.cities[row.city], message.request, row.request);
             ws.send(JSON.stringify({message: 'request selected', data: {
               winner: ans,
               request_my: message.request,
