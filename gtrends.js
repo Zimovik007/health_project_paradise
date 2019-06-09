@@ -114,11 +114,11 @@ function compare(city, query1, query2) {
     })
   ]
   ).then(() => {
-    if (ar[0] > ar[1]) return query1;
-    if (ar[0] < ar[1]) return query2;
-    if (ss[0] > ss[1]) return query1;
-    if (ss[0] < ss[1]) return query2;
-    return null;
+    if (ar[0] > ar[1]) return 1;
+    if (ar[0] < ar[1]) return -1;
+    if (ss[0] > ss[1]) return 1;
+    if (ss[0] < ss[1]) return -1;
+    return 0;
   });
 }
 

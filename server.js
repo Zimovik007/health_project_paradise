@@ -7,6 +7,8 @@ const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 
 const gtrends = require('./gtrends.js');
+const compare = require('./gtrends.js').compare;
+// export compare from './gtrends.js';
 
 
 const port = process.env.PORT || 8080;
@@ -116,8 +118,6 @@ app.ws('/', function(ws, req) {
           else {
             db.run(`UPDATE users SET searching = 0 WHERE id = ?`, [row.id]);
 
-
-
             let stmt = db.prepare(`INSERT INTO matches(id_first, id_second) VALUES(?, ?)`);
             stmt.run([message.id, row.id], function(err){
               if (err) {}
@@ -190,7 +190,7 @@ app.ws('/', function(ws, req) {
 
           if (row.request) {
             //let city_list = ['asdf', 'fdsa'];
-            let ans = 0;//magic(message.request, row.request, city_list[row.city])
+            let ans = compare(gtrends.cities[row.city], message.request, row.request);
             ws.send(JSON.stringify({message: 'request selected', data: {
               winner: ans,
               request_my: message.request,
@@ -215,16 +215,17 @@ app.ws('/', function(ws, req) {
       default:
         break;
     }
-    console.log(msg);
   });
 
-  console.log('socket asdf');
+  ws.on('close', req => {
+    ws_connections.forEach((item, index) => {
+      if (item === ws) {
+        delete ws_connections[index];
+      }
+    });
+  });
 
-  var object = {
-    message: 'welcome to the socket api',
-    time: Date.now().toString()
-  };
-  ws.send(JSON.stringify(object));
+  console.log('socket connected');
 });
 
 app.use((req, res) => {
