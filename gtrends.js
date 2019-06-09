@@ -131,7 +131,7 @@ exports.compare = async function(city, query1, query2) {
   // console.log(cmpres);
 // })
 
-function compare_cities(disease, city1, city2) {
+exports.compare_cities = function(disease, city1, city2) {
   return googleTrends.interestByRegion({keyword: disease, category: 45, hl:'RU', geo: 'RU', startTime: new Date(Date.now() - (20*365 * 24 * 60 * 60 * 1000)), resolution: 'CITY'})
   .then((res) => {
     res = JSON.parse(res);

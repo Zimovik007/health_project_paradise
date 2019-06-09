@@ -282,19 +282,19 @@ app.ws('/', function(ws, req) {
         break;
       case 'health city selected':
         db.get('SELECT categories, city FROM matches WHERE id = ?', [ws.game_id], async (err, row) => {
-          if (row.request) {
+          if (row.city) {
             gtrends.compare_cities(gtrends.diseases[row.categories], gtrends.cities[message.city_id], gtrends.diseases[row.city]).then(ans => {
               ws.send(JSON.stringify({message: 'health city selected', data: {
                 winner: ans,
                 request_my: gtrends.cities[message.city_id],
-                request_enemy: gtrends.diseases[row.city],
+                request_enemy: gtrends.cities[row.city],
               }}));
               ws.close();
               ws_connections.forEach((item) => {
                 if (item.game_id === ws.game_id && item !== ws) {
                   item.send(JSON.stringify({message: 'request selected', data: {
                     winner: -1 * ans,
-                    request_my: gtrends.diseases[row.city],
+                    request_my: gtrends.cities[row.city],
                     request_enemy: gtrends.cities[message.city_id],
                   }}));
                   item.close();
