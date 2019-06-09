@@ -28,7 +28,6 @@ class GameStage5 extends React.Component{
         this.setState({
             formDisable: true,
         });
-        alert(this.state.query);
     }
     
     render(){
