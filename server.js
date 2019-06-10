@@ -64,7 +64,7 @@ app.use((req, res, next) => {
 app.post('/register', (req, res) => {
   // TODO: validation
 
-  db.run(`INSERT INTO users(login, password) VALUES(?, ?)`, [req.body.login, req.body.password], (err) => {
+  db.run(`INSERT INTO users(login, password) VALUES(?, ?)`, [req.body.login, req.body.password], function (err) {
     if (err) {
       res.json({ status: err.message });
     }
